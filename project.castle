@@ -3,3 +3,5 @@ main: main.lua
 title: Ballz 'n Linez
 owner: liquidream
 description: Linez and linez and linez...
+coverImage: cover-image.png
+primaryColor: 124f88
