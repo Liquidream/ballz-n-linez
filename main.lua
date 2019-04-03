@@ -23,9 +23,10 @@ local RENDER_WIDTH
 local RENDER_HEIGHT
 local RENDER_X
 local RENDER_Y
--- Colours
-local col = fromRGB(22,232,244)
-
+-- Other
+local COL = fromRGB(22,232,244)
+local NUM = 128
+local MAX_SPEED = 1
 --
 -- Fields
 --
@@ -34,17 +35,61 @@ local ballz={}
 
 
 function initScene()  
-
+  -- Generate ballz/dots
+  for i = 0,NUM do
+    -- Create new ball
+    local ball = {
+      x = love.math.random(GAME_WIDTH),
+      y = love.math.random(GAME_HEIGHT),
+      dx = love.math.random()*MAX_SPEED-MAX_SPEED/2,
+      dy = love.math.random()*MAX_SPEED-MAX_SPEED/2,
+      lum = love.math.random(2)==1 and 0.25 or 0.5
+    }
+    -- Add to list
+    ballz[i] = ball
+  end
 end
 
 function drawScene()  
   love.graphics.clear()
-  local y_offset = 8 * math.sin(total_time_elapsed * 3)
-  love.graphics.print('Edit main.lua to get started!', 40, 30 + y_offset)
-  love.graphics.print('Press Cmd/Ctrl + R to reload.', 40, 40 + y_offset)
+  -- Default to muted colour brightness
+  
+
+  -- Draw all the ballz+linez
+  for i = 0,NUM do
+    -- Get the next ball...
+    local ball = ballz[i]
+    
+    -- Update ball
+    -- (Normally wouldn't do this in draw code, 
+    --  but we need pos info on surrounding ballz)
+    
+    -- Move ball (+ wrap to screen bounds)
+    ball.x = (ball.x + ball.dx) % GAME_WIDTH
+    ball.y = (ball.y + ball.dy) % GAME_HEIGHT
+
+    -- Now compare current ball to others
+    for j=i,NUM do
+      local otherBall = ballz[j]
+      local diffX = ball.x - otherBall.x
+      local diffY = ball.y - otherBall.y
+      local dist = math.sqrt( diffX*diffX + diffY*diffY )
+      if (dist < 50) then
+        COL[4] = 1-dist/50
+        love.graphics.setColor(COL)
+        love.graphics.line(ball.x, ball.y, otherBall.x, otherBall.y)
+      end
+    end
+
+    -- Finally, draw the ball/dot
+    COL[4] = ball.lum
+    love.graphics.setColor(COL)
+    love.graphics.circle("fill", ball.x, ball.y, 1)
+  end
 end
 
 function updateScene()  
+ -- (All in draw code...)
 end
 
 
@@ -69,6 +114,8 @@ end
 function love.load()
   -- initialise and update the gfx display
   updateDisplay()
+  -- initilise the scene
+  initScene()
 end
 
 function love.draw()
