@@ -112,6 +112,10 @@ end
 
 
 function love.load()
+  -- Test for Nikki
+  local width, height = love.graphics.getDimensions()
+  print(">>>> Nikki: "..width..","..height)
+  
   -- initialise and update the gfx display
   updateDisplay()
   -- initilise the scene
